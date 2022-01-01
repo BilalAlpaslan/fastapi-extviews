@@ -3,7 +3,7 @@ from typing import List
 from fastapi import FastAPI, APIRouter, Depends, Header, HTTPException
 from pydantic import BaseModel
 
-from extviews import ViewSet, register
+from extviews import ViewSet
 
 app = FastAPI()
 
@@ -60,7 +60,7 @@ class UserViewSet(ViewSet):
         return {'message': 'Hello World extra_method'}
 
 
-app.include_router(register(UserViewSet))
+app.include_router(UserViewSet())
 
 if __name__ == '__main__':
     import uvicorn

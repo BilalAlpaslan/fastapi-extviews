@@ -26,6 +26,10 @@ class ViewSet:
     functions: List[Callable] = []
     extra_functions: List[List] = []
     
+    def __new__(cls) -> APIRouter:
+        router = cls.execute()
+        return router
+    
     @classmethod
     def get_response_model(cls, action: str) -> Union[BaseModel, None]:
         """ if override this method, you can return different response model for different action """
@@ -116,7 +120,3 @@ class ViewSet:
             return func
         return decorator
 
-def register(cls: ViewSet) -> APIRouter:
-    """ for registering ViewSet """
-    router = cls.execute()
-    return router

@@ -2,11 +2,10 @@
 
 __version__ = "0.1.0"
 
-from .viewset import ViewSet, register
+from .viewset import ViewSet
 
 __all__ = [
     'ViewSet',
-    'register',
 ]
 
 

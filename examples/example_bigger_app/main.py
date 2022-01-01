@@ -1,6 +1,4 @@
-from typing import List
 from fastapi import FastAPI
-from extviews import  register
 
 from api.user import UserViewSet
 
@@ -12,7 +10,7 @@ async def root():
     return {'message': 'Hello World'}
 
 
-app.include_router(register(UserViewSet))
+app.include_router(UserViewSet())
 
 if __name__ == '__main__':
     import uvicorn
