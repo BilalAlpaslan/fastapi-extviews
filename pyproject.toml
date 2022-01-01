@@ -3,7 +3,7 @@ name = "fastapi-extviews"
 version = "0.1.0"
 description = "extviews is a fastapi library for creating RESTful APIs with a single class."
 readme = "README.md"
-homepage = "https://github.com/BilalAlpaslan/Pyonize"
+homepage = "https://github.com/BilalAlpaslan/fastapi-extviews"
 authors = ["Bilal Alpaslan <m.bilal.alpaslan@gmail.com>"]
 license = "LICENSE"
 packages = [{include = "extviews/*"}]
