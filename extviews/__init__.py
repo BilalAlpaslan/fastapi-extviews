@@ -3,13 +3,15 @@
 __version__ = "0.1.0"
 
 from .viewset import ViewSet, CrudViewSet
-from .crudset import BaseCrudSet, GenericCrudSet
+from .crudset import BaseCrudSet, ModelCrudSet, PymongoCrudSet, MotorCrudSet
 
 __all__ = [
     'ViewSet',
     'CrudViewSet',
     'BaseCrudSet',
-    'GenericCrudSet',
+    'ModelCrudSet',
+    'PymongoCrudSet',
+    'MotorCrudSet', # !: not yet implemented
 ]
 
 

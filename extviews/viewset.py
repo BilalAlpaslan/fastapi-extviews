@@ -149,22 +149,22 @@ class CrudViewSet(ViewSet):
     def register_crud(cls):
         model = cls.model
         
-        def list():
+        async def list():
             return cls._crud.list()
         
-        def retrieve(id : int):
+        async def retrieve(id : int):
             return cls._crud.retrieve(id)
         
-        def create(data : model):
+        async def create(data : model):
             return cls._crud.create(data)
         
-        def update(id : int, data : model):
+        async def update(id : int, data : model):
             return cls._crud.update(id, data)
 
-        def partial_update(id : int, data : model):
+        async def partial_update(id : int, data : model):
             return cls._crud.partial_update(id, data)
 
-        def destroy(id : int):
+        async def destroy(id : int):
             return cls._crud.destroy(id)
         
         setattr(cls, "list", list)
