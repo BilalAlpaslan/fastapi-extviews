@@ -167,11 +167,12 @@ class CrudViewSet(ViewSet):
         async def destroy(id : int):
             return cls._crud.destroy(id)
         
-        setattr(cls, "list", list)
-        setattr(cls, "retrieve", retrieve)
-        setattr(cls, "create", create)
-        setattr(cls, "update", update)
-        setattr(cls, "partial_update", partial_update)
-        setattr(cls, "destroy", destroy)
+        
+        if not hasattr(cls, 'list'): setattr(cls, "list", list)
+        if not hasattr(cls, 'retrieve'): setattr(cls, "retrieve", retrieve)
+        if not hasattr(cls, 'create'): setattr(cls, "create", create)
+        if not hasattr(cls, 'update'): setattr(cls, "update", update)
+        if not hasattr(cls, 'partial_update'): setattr(cls, "partial_update", partial_update)
+        if not hasattr(cls, 'destroy'): setattr(cls, "destroy", destroy)
 
 
