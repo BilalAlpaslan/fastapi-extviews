@@ -3,10 +3,12 @@ from fastapi import APIRouter
 from fastapi.params import Depends
 from pydantic import BaseModel
 
-__all__ = ['ViewSet', 'register']
+from .crudset import BaseCrudSet
+
+__all__ = ['ViewSet', 'CrudViewSet']
 
 supported_methods_names: List[str] = [
-    'list', 'retrieve', 'create', 'update', 'partial_update', 'delete']
+    'list', 'retrieve', 'create', 'update', 'partial_update', 'destroy']
 
 
 class ViewSet:
@@ -15,6 +17,7 @@ class ViewSet:
     class_tag: str = None
     path_key: str = "id"
     response_model: BaseModel = None
+    dependencies: Sequence[Depends] = None
     """
     router: APIRouter = None
     base_path: str = None
@@ -22,14 +25,15 @@ class ViewSet:
     path_key: str = "id"
     response_model: BaseModel = None
     dependencies: Sequence[Depends] = None
-    
-    functions: List[Callable] = []
-    extra_functions: List[List] = []
-    
+
+
     def __new__(cls) -> APIRouter:
-        router = cls.execute()
-        return router
-    
+        cls.functions: List[Callable] = []
+        cls.extra_functions: List[List] = []
+
+        cls.execute()
+        return cls.router
+
     @classmethod
     def get_response_model(cls, action: str) -> Union[BaseModel, None]:
         """ if override this method, you can return different response model for different action """
@@ -38,12 +42,11 @@ class ViewSet:
         return None
     
     @classmethod
-    def get_dependenciesl(cls, action: str) -> Sequence[Depends]:
+    def get_dependencies(cls, action: str) -> Sequence[Depends]:
         """ if override this method, you can return different dependencies for different action """
         if cls.dependencies is not None:
             return cls.dependencies
         return None
-
 
     @classmethod
     def execute(cls) -> APIRouter:
@@ -57,17 +60,18 @@ class ViewSet:
         if cls.class_tag is None:
             cls.class_tag = cls.__name__
 
-        for func in cls.__dict__.keys():
-            if func in supported_methods_names:
-                cls.functions.append(cls.__dict__[func])
-
+        for func in supported_methods_names:
+            if hasattr(cls, func):
+                cls.functions.append(getattr(cls, func))
+        
+        cls.extra()
+        
         for func in cls.functions:
             cls._register_route(func)
-        
+
         for func,methods,path in cls.extra_functions:
             cls._register_extra_route(func, methods=methods, path=path)
 
-        return cls.router
 
     @classmethod
     def _register_route(cls, func: Callable):
@@ -78,27 +82,27 @@ class ViewSet:
         
         if func.__name__ == 'list':
             extras['response_model'] = cls.get_response_model(func.__name__)
-            extras['dependencies'] = cls.get_dependenciesl(func.__name__)
+            extras['dependencies'] = cls.get_dependencies(func.__name__)
             cls.router.add_api_route(cls.base_path, func, tags=[cls.class_tag], methods=['GET'],**extras)
         elif func.__name__ == 'retrieve':
             extras['response_model'] = cls.get_response_model(func.__name__)
-            extras['dependencies'] = cls.get_dependenciesl(func.__name__)
+            extras['dependencies'] = cls.get_dependencies(func.__name__)
             cls.router.add_api_route(f"{cls.base_path}/\u007b{cls.path_key}\u007d", func, tags=[cls.class_tag], methods=['GET'],**extras)
         elif func.__name__ == 'create':
             extras['response_model'] = cls.get_response_model(func.__name__)
-            extras['dependencies'] = cls.get_dependenciesl(func.__name__)
+            extras['dependencies'] = cls.get_dependencies(func.__name__)
             cls.router.add_api_route(cls.base_path, func, tags=[cls.class_tag], methods=['POST'],**extras)
         elif func.__name__ == 'update':
             extras['response_model'] = cls.get_response_model(func.__name__)
-            extras['dependencies'] = cls.get_dependenciesl(func.__name__)
+            extras['dependencies'] = cls.get_dependencies(func.__name__)
             cls.router.add_api_route(f"{cls.base_path}/\u007b{cls.path_key}\u007d", func, tags=[cls.class_tag], methods=['PUT'],**extras)
         elif func.__name__ == 'partial_update':
             extras['response_model'] = cls.get_response_model(func.__name__)
-            extras['dependencies'] = cls.get_dependenciesl(func.__name__)
+            extras['dependencies'] = cls.get_dependencies(func.__name__)
             cls.router.add_api_route(f"{cls.base_path}/\u007b{cls.path_key}\u007d", func, tags=[cls.class_tag], methods=['PATCH'],**extras)
-        elif func.__name__ == 'delete':
+        elif func.__name__ == 'destroy':
             extras['response_model'] = cls.get_response_model(func.__name__)
-            extras['dependencies'] = cls.get_dependenciesl(func.__name__)
+            extras['dependencies'] = cls.get_dependencies(func.__name__)
             cls.router.add_api_route(f"{cls.base_path}/\u007b{cls.path_key}\u007d", func, tags=[cls.class_tag], methods=['DELETE'],**extras)
         else:
             print(f"Method {func.__name__} is not supported")
@@ -107,7 +111,7 @@ class ViewSet:
     def _register_extra_route(cls, func: Callable, methods: List[str] = ["GET"], path: str = None):
         extras = {}
         extras['response_model'] = cls.get_response_model(func.__name__)
-        extras['dependencies'] = cls.get_dependenciesl(func.__name__)
+        extras['dependencies'] = cls.get_dependencies(func.__name__)
         if path is None:
             path = func.__name__
         cls.router.add_api_route(f"{cls.base_path}{path}", func, tags=[cls.class_tag], methods=methods,**extras)
@@ -119,4 +123,55 @@ class ViewSet:
             cls.extra_functions.append([func, methods, path_key])
             return func
         return decorator
+    
+    @classmethod
+    def extra(cls):
+        """ if you want to add extra method to the viewset, you can use this decorator """
+
+
+class CrudViewSet(ViewSet):
+    """
+    This is the base viewset for CRUD operations.
+    """
+    crud: BaseCrudSet = None
+    model: BaseModel = None
+
+    def __new__(cls) -> APIRouter:
+        assert cls.crud is not None, "You must define crud model"
+        assert cls.model is not None, "You must define model"
+        
+        cls._crud = cls.crud()
+        cls.register_crud()
+        
+        return super().__new__(cls)
+
+    @classmethod
+    def register_crud(cls):
+        model = cls.model
+        
+        def list():
+            return cls._crud.list()
+        
+        def retrieve(id : int):
+            return cls._crud.retrieve(id)
+        
+        def create(data : model):
+            return cls._crud.create(data)
+        
+        def update(id : int, data : model):
+            return cls._crud.update(id, data)
+
+        def partial_update(id : int, data : model):
+            return cls._crud.partial_update(id, data)
+
+        def destroy(id : int):
+            return cls._crud.destroy(id)
+        
+        setattr(cls, "list", list)
+        setattr(cls, "retrieve", retrieve)
+        setattr(cls, "create", create)
+        setattr(cls, "update", update)
+        setattr(cls, "partial_update", partial_update)
+        setattr(cls, "destroy", destroy)
+
 

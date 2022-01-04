@@ -2,10 +2,14 @@
 
 __version__ = "0.1.0"
 
-from .viewset import ViewSet
+from .viewset import ViewSet, CrudViewSet
+from .crudset import BaseCrudSet, GenericCrudSet
 
 __all__ = [
     'ViewSet',
+    'CrudViewSet',
+    'BaseCrudSet',
+    'GenericCrudSet',
 ]
 
 
