@@ -55,10 +55,6 @@ class UserViewSet(ViewSet):
     def delete(id: int):
         return {'message': f'Hello World delete {id}'}
 
-    @ViewSet.extra_method(methods=["POST"], path_key="/{id}/like")
-    def like(id: int):
-        return {'message': 'Hello World extra_method'}
-
 
 app.include_router(UserViewSet())
 
