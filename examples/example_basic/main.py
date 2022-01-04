@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import FastAPI, APIRouter, Depends, Header, HTTPException
+from fastapi import FastAPI, Depends, Header, HTTPException
 from pydantic import BaseModel
 
 from extviews import ViewSet
