@@ -59,7 +59,7 @@ class PymongoCrudSet(ModelCrudSet):
         if self.collecttion is None:
             self.collecttion = self.model.__name__.lower()
             
-        self.db =  self.connection().get_db()
+        self.db =  self.connection.get_db()
         self._collection = self.db[self.collecttion]
         super().__init__()
 
