@@ -7,6 +7,8 @@ from extviews import CrudViewSet
 
 app = FastAPI()
 
+conn = PymongoConnection()
+
 #------------------------------------------------------------------------------
 # Models
 class User(BaseModel):
@@ -18,7 +20,7 @@ class User(BaseModel):
 # CRUD SET
 
 class UserCrudSet(PymongoCrudSet):
-    connection = PymongoConnection
+    connection = conn
     collection = "users"
     model = User
 

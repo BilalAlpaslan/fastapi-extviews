@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastapi-extviews"
-version = "0.1.0"
+version = "0.1.1"
 description = "extviews is a fastapi library for creating RESTful APIs with a single class."
 readme = "README.md"
 homepage = "https://github.com/BilalAlpaslan/fastapi-extviews"
@@ -11,6 +11,8 @@ packages = [{include = "extviews/*"}]
 [tool.poetry.dependencies]
 python = ">=3.7"
 fastapi = ">=0.70"
+pymongo = ">=3.11"
+motor = ">=2.0"
 
 [build-system]
 requires = ["poetry>=0.12"]
