@@ -135,6 +135,7 @@ class CrudViewSet(ViewSet):
     """
     crud: BaseCrudSet = None
     model: BaseModel = None
+    async_db = False
 
     def __new__(cls) -> APIRouter:
         assert cls.crud is not None, "You must define crud model"
@@ -149,22 +150,35 @@ class CrudViewSet(ViewSet):
     def register_crud(cls):
         model = cls.model
         
-        async def list():
+        
+        async def list() -> List[model]:
+            if cls.async_db:
+                return await cls._crud.list()
             return cls._crud.list()
         
-        async def retrieve(id : int):
+        async def retrieve(id : int) -> model:
+            if cls.async_db:
+                return await cls._crud.retrieve(id)
             return cls._crud.retrieve(id)
         
-        async def create(data : model):
+        async def create(data : model) -> model:
+            if cls.async_db:
+                return await cls._crud.create(data)
             return cls._crud.create(data)
         
-        async def update(id : int, data : model):
+        async def update(id : int, data : model) -> model:
+            if cls.async_db:
+                return await cls._crud.update(id, data)
             return cls._crud.update(id, data)
 
-        async def partial_update(id : int, data : model):
+        async def partial_update(id : int, data : model) -> model:
+            if cls.async_db:
+                return await cls._crud.partial_update(id, data)
             return cls._crud.partial_update(id, data)
 
-        async def destroy(id : int):
+        async def destroy(id : int) -> model:
+            if cls.async_db:
+                return await cls._crud.destroy(id)
             return cls._crud.destroy(id)
         
         
