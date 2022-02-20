@@ -10,7 +10,7 @@ async def root():
     return {'message': 'Hello World'}
 
 
-app.include_router(UserViewSet())
+app.include_router(UserViewSet().router)
 
 if __name__ == '__main__':
     import uvicorn

@@ -39,15 +39,9 @@ class UserCrudViewSet(CrudViewSet):
     model = User
     
     async_db = True
-    
-    @classmethod
-    def get_response_model(cls, action: str) -> BaseModel :
-        if action == 'list':
-            return List[User]
-        return User
 
 
-app.include_router(UserCrudViewSet())
+app.include_router(UserCrudViewSet().router)
 
 
 if __name__ == '__main__':
