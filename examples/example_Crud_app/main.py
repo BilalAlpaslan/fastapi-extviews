@@ -34,7 +34,7 @@ class UserCrudViewSet(CrudViewSet):
     model = User
 
 
-app.include_router(UserCrudViewSet())
+app.include_router(UserCrudViewSet().router)
 
 
 if __name__ == '__main__':

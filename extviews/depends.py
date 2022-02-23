@@ -1,13 +1,11 @@
-
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 
 from fastapi import Depends
 
+from .exceptions import create_query_validation_exception
 
-PAGINATION = dict(skip=int, limit=int)
 
-def create_query_validation_exception(field: str, msg: str) -> Exception:
-    return Exception(f"Invalid query parameter: '{field}' - {msg}")
+PAGINATION = Dict[str, Optional[int]]
 
 
 def pagination_depends(max_limit: Optional[int] = None) -> Any:

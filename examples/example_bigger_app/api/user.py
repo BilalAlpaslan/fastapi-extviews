@@ -22,17 +22,17 @@ class UserViewSet(ViewSet):
             return [Depends(verify_token)]
         return None
         
-    def list(): # TODO: if we use "self" can we remove this ? viewset ViewSet._register_route function
+    def list(self): # TODO: if we use "self" can we remove this ? viewset ViewSet._register_route function
         return get_users()
 
-    def retrieve(id: int):
+    def retrieve(self, id: int):
         return {'message': f'Hello World {id}'}
     
-    def create(user: User):
+    def create(self, user: User):
         return {'message': f'Hello World create {user.id}'}
     
-    def update(id: int):
+    def update(self, id: int):
         return {'message': f'Hello World update {id}'}
     
-    def delete(id: int):
+    def delete(self, id: int):
         return {'message': f'Hello World delete {id}'}

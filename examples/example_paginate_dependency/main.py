@@ -41,17 +41,15 @@ class UserCrudViewSet(CrudViewSet):
     crud = UserCrudSet
     model = User
     
-    @classmethod
-    def get_dependencies(cls, action: str) -> Sequence[Depends]:
+    def get_dependencies(self, action: str) -> Sequence[Depends]:
         if action in ['list']:
             return [pagination_depends(max_limit=10)]
         return None
     
-    @classmethod
-    def list(cls, skip: int = 0, limit: int = 10) -> Sequence[User]:
-        return cls._crud.list(skip=skip, limit=limit)
+    def list(self, skip: int = 0, limit: int = 10) -> Sequence[User]:
+        return self._crud.list(skip=skip, limit=limit)
 
-app.include_router(UserCrudViewSet())
+app.include_router(UserCrudViewSet().router)
 
 
 if __name__ == '__main__':
