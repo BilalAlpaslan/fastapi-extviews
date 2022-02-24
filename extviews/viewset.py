@@ -73,9 +73,8 @@ class ViewSet:
             if param in hidden_params:
                 ...
                 # param = Header(None, include_in_schema=False)
-                
+
                 # TODO : fix this
-                
 
         extras = {}  # TODO: not going well this way
 
@@ -145,47 +144,34 @@ class CrudViewSet(ViewSet):
         assert self.model is not None, "You must define model"
 
         self._crud = self.crud()
-        self.register_crud()
-
         super().__init__()
 
-    def register_crud(self):
-        model = self.model
+    async def list(self) -> List[model]:
+        if self.async_db:
+            return await self._crud.list()
+        return self._crud.list()
 
-        async def list() -> List[model]:
-            if self.async_db:
-                return await self._crud.list()
-            return self._crud.list()
+    async def retrieve(self, id: int) -> model:
+        if self.async_db:
+            return await self._crud.retrieve(id)
+        return self._crud.retrieve(id)
 
-        async def retrieve(id : int) -> model:
-            if self.async_db:
-                return await self._crud.retrieve(id)
-            return self._crud.retrieve(id)
+    async def create(self, data: model) -> model:
+        if self.async_db:
+            return await self._crud.create(data)
+        return self._crud.create(data)
 
-        async def create(data : model) -> model:
-            if self.async_db:
-                return await self._crud.create(data)
-            return self._crud.create(data)
+    async def update(self, id: int, data: model) -> model:
+        if self.async_db:
+            return await self._crud.update(id, data)
+        return self._crud.update(id, data)
 
-        async def update(id : int, data : model) -> model:
-            if self.async_db:
-                return await self._crud.update(id, data)
-            return self._crud.update(id, data)
+    async def partial_update(self, id: int, data: model) -> model:
+        if self.async_db:
+            return await self._crud.partial_update(id, data)
+        return self._crud.partial_update(id, data)
 
-        async def partial_update(id : int, data : model) -> model:
-            if self.async_db:
-                return await self._crud.partial_update(id, data)
-            return self._crud.partial_update(id, data)
-
-        async def destroy(id : int) -> model:
-            if self.async_db:
-                return await self._crud.destroy(id)
-            return self._crud.destroy(id)
-
-
-        if not hasattr(self, 'list'): setattr(self, "list", list)
-        if not hasattr(self, 'retrieve'): setattr(self, "retrieve", retrieve)
-        if not hasattr(self, 'create'): setattr(self, "create", create)
-        if not hasattr(self, 'update'): setattr(self, "update", update)
-        if not hasattr(self, 'partial_update'): setattr(self, "partial_update", partial_update)
-        if not hasattr(self, 'destroy'): setattr(self, "destroy", destroy)
+    async def destroy(self, id: int) -> model:
+        if self.async_db:
+            return await self._crud.destroy(id)
+        return self._crud.destroy(id)
