@@ -50,7 +50,7 @@ class ViewSet:
             self.router = APIRouter()
 
         if self.base_path is None:
-            self.base_path = '/' + self.__class__.__name__
+            self.base_path = '/' + self.__class__.__name__.lower()
 
         if self.class_tag is None:
             self.class_tag = self.__class__.__name__
