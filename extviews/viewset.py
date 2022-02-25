@@ -128,7 +128,8 @@ class ViewSet:
         return decorator
 
     def extra(self):
-        """ if you want to add extra method to the viewset, you can use this decorator """
+        """ if you want to add extra method to the viewset, you can override this method and use extra_method decorator """
+        # TODO: maybe this is not the best way to do this but it works for now
 
 
 class CrudViewSet(ViewSet):
