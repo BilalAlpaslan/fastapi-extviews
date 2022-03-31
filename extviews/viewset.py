@@ -69,43 +69,28 @@ class ViewSet:
 
     def _register_route(self, func: Callable, hidden_params: List[str] = ["self"]):
 
-        for i, param in enumerate(func.__code__.co_varnames):
-            if param in hidden_params:
-                ...
-                # param = Header(None, include_in_schema=False)
+        # hidden_params TODO: add support for hidden params
 
-                # TODO : fix this
-
-        extras = {}  # TODO: not going well this way
+        extras = {}
+        extras['response_model'] = self.get_response_model(func.__name__)
+        extras['dependencies'] = self.get_dependencies(func.__name__)
 
         if func.__name__ == 'list':
-            extras['response_model'] = self.get_response_model(func.__name__)
-            extras['dependencies'] = self.get_dependencies(func.__name__)
             self.router.add_api_route(self.base_path, func, tags=[
                                       self.class_tag], methods=['GET'], **extras)
         elif func.__name__ == 'retrieve':
-            extras['response_model'] = self.get_response_model(func.__name__)
-            extras['dependencies'] = self.get_dependencies(func.__name__)
             self.router.add_api_route(f"{self.base_path}/\u007b{self.path_key}\u007d", func, tags=[
                                       self.class_tag], methods=['GET'], **extras)
         elif func.__name__ == 'create':
-            extras['response_model'] = self.get_response_model(func.__name__)
-            extras['dependencies'] = self.get_dependencies(func.__name__)
             self.router.add_api_route(self.base_path, func, tags=[
                                       self.class_tag], methods=['POST'], **extras)
         elif func.__name__ == 'update':
-            extras['response_model'] = self.get_response_model(func.__name__)
-            extras['dependencies'] = self.get_dependencies(func.__name__)
             self.router.add_api_route(f"{self.base_path}/\u007b{self.path_key}\u007d", func, tags=[
                                       self.class_tag], methods=['PUT'], **extras)
         elif func.__name__ == 'partial_update':
-            extras['response_model'] = self.get_response_model(func.__name__)
-            extras['dependencies'] = self.get_dependencies(func.__name__)
             self.router.add_api_route(f"{self.base_path}/\u007b{self.path_key}\u007d", func, tags=[
                                       self.class_tag], methods=['PATCH'], **extras)
         elif func.__name__ == 'destroy':
-            extras['response_model'] = self.get_response_model(func.__name__)
-            extras['dependencies'] = self.get_dependencies(func.__name__)
             self.router.add_api_route(f"{self.base_path}/\u007b{self.path_key}\u007d", func, tags=[
                                       self.class_tag], methods=['DELETE'], **extras)
         else:
