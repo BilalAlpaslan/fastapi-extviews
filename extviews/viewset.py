@@ -25,6 +25,7 @@ class ViewSet:
     path_key: str = "id"
     response_model: BaseModel = None
     dependencies: Sequence[Depends] = None
+    marked_functions: List = []
 
     def __init__(self) -> APIRouter:
         self.functions: List[Callable] = []
@@ -59,12 +60,10 @@ class ViewSet:
             if hasattr(self, func):
                 self.functions.append(getattr(self, func))
 
-        self.extra()
-
         for func in self.functions:
             self._register_route(func)
 
-        for func, methods, path in self.extra_functions:
+        for func, methods, path in self.find_marked_functions():
             self._register_extra_route(func, methods=methods, path=path)
 
     def _register_route(self, func: Callable, hidden_params: List[str] = ["self"]):
@@ -105,16 +104,22 @@ class ViewSet:
         self.router.add_api_route(f"{self.base_path}{path}", func, tags=[
                                   self.class_tag], methods=methods, **extras)
 
-    def extra_method(self, methods: List[str] = ["GET"], path_key: str = None):
+    @classmethod
+    def extra_method(cls, methods: List[str] = ["GET"], path_key: str = None):
         """ if you want to add extra method to the viewset, you can use this decorator """
         def decorator(func):
-            self.extra_functions.append([func, methods, path_key])
+            cls.marked_functions.append([func, methods, path_key])
             return func
         return decorator
 
-    def extra(self):
-        """ if you want to add extra method to the viewset, you can override this method and use extra_method decorator """
-        # TODO: maybe this is not the best way to do this but it works for now
+    def find_marked_functions(self):
+        for func in dir(self):
+            for marked_func in self.marked_functions:
+                if func == marked_func[0].__name__:
+                    self.extra_functions.append(marked_func)
+                    self.marked_functions.remove(marked_func)
+                    break
+        return self.extra_functions
 
 
 class CrudViewSet(ViewSet):
